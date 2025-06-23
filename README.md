@@ -27,9 +27,17 @@ Drag and drop your audio file (and optionally transcript and lexicon files) then
 
 ## Updating
 
-To get the latest version of AudioGUI, run:
+To get the latest version of AudioGUI, use the update script.
+
+On Windows run:
 
 ```bash
 update.bat
+```
+
+On other platforms use:
+
+```bash
+python update.py
 ```
 
