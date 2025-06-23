@@ -22,7 +22,7 @@ On non-Windows systems, use:
 python syllable_segmenter_gui.py
 ```
 
-Drag and drop your audio file (and optionally transcript and lexicon files) then click **Start Segmentation**. Results are written in the specified output directory.
+Drag and drop your audio file (and optionally transcript and lexicon files) then click **Start Segmentation**. Results are stored in an `export` subfolder inside the chosen output directory.
 
 ## Updating
 
