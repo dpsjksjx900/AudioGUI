@@ -119,13 +119,15 @@ class MainWindow(QMainWindow):
         self.forced_rb.toggled.connect(self._update_mode)
         self.start_btn.clicked.connect(self.start_segmentation)
         self.audio_edit.textChanged.connect(self._sync_output_dir)
-        self._update_mode()
 
         # Set up logger
         self.logger = logging.getLogger("Segmenter")
         self.logger.setLevel(logging.DEBUG)
         gui_handler = QTextEditLogger(self.log_widget)
         self.logger.addHandler(gui_handler)
+
+        # Apply initial UI state now that logger exists
+        self._update_mode()
 
     def _update_mode(self):
         forced = self.forced_rb.isChecked()
