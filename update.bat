@@ -1,19 +1,16 @@
 @echo off
 REM Automatically update repository from GitHub
 
-REM Check if git is available
+REM Ensure current directory is the script's location
+cd /d %~dp0
+
+REM Prefer git if available
 where git >nul 2>&1
-IF ERRORLEVEL 1 (
-    echo git is not installed or not found in PATH.
-    exit /b 1
+if %errorlevel%==0 (
+    echo 🔄 Updating repository via git...
+    git pull
+    goto :eof
 )
 
-REM Pull latest changes
-echo 🔄 Updating repository...
-git pull
-IF ERRORLEVEL 1 (
-    echo Failed to update from GitHub.
-    exit /b 1
-)
-
-echo Update complete.
+REM Fallback to Python download
+python update.py
