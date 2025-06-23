@@ -21,12 +21,11 @@ def run_forced_align(audio: str, transcript: str, lexicon: str, outdir: str, log
 
 
 def run_unsupervised(audio: str, outdir: str, logger: logging.Logger) -> str:
-    """Split audio into segments based on onset detection and name them by pronunciation."""
+    """Split audio into segments based on onset detection."""
     import librosa
     import numpy as np
     import soundfile as sf
     import speech_recognition as sr
-    import re
 
     export_dir = os.path.join(outdir, "export")
     os.makedirs(export_dir, exist_ok=True)
@@ -57,14 +56,11 @@ def run_unsupervised(audio: str, outdir: str, logger: logging.Logger) -> str:
             logger.warning(f"Recognition failed for segment {i+1}: {e}")
             phrase = f"segment_{i+1:03d}"
 
-        base = re.sub(r"[^a-zA-Z0-9_-]+", "_", phrase.strip()).strip("_")
-        if not base:
-            base = f"segment_{i+1:03d}"
-
-        out_path = os.path.join(export_dir, f"{base}.wav")
+        file_name = f"{i+1:03d}.wav"
+        out_path = os.path.join(export_dir, file_name)
         count = 1
         while os.path.exists(out_path):
-            out_path = os.path.join(export_dir, f"{base}_{count}.wav")
+            out_path = os.path.join(export_dir, f"{i+1:03d}_{count}.wav")
             count += 1
 
         sf.write(out_path, segment, sr_rate)
