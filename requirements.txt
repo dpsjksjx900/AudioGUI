@@ -1,3 +1,5 @@
 PyQt5>=5.15
 librosa>=0.9
 soundfile>=0.10
+SpeechRecognition>=3.8
+pocketsphinx>=5.0

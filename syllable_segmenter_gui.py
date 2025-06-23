@@ -21,32 +21,57 @@ def run_forced_align(audio: str, transcript: str, lexicon: str, outdir: str, log
 
 
 def run_unsupervised(audio: str, outdir: str, logger: logging.Logger) -> str:
-    """Split audio into segments based on onset detection."""
+    """Split audio into segments based on onset detection and name them by pronunciation."""
     import librosa
     import numpy as np
     import soundfile as sf
+    import speech_recognition as sr
+    import re
+
+    export_dir = os.path.join(outdir, "export")
+    os.makedirs(export_dir, exist_ok=True)
 
     logger.debug("Loading audio file")
-    y, sr = librosa.load(audio, sr=None)
-    duration = librosa.get_duration(y=y, sr=sr)
+    y, sr_rate = librosa.load(audio, sr=None)
+    duration = librosa.get_duration(y=y, sr=sr_rate)
 
     logger.debug("Detecting onsets")
-    onsets = librosa.onset.onset_detect(y=y, sr=sr, units="time")
+    onsets = librosa.onset.onset_detect(y=y, sr=sr_rate, units="time")
 
-    # Ensure boundaries include start and end
     boundaries = np.concatenate([[0.0], onsets, [duration]])
     logger.debug(f"Detected {len(onsets)} onsets; creating {len(boundaries)-1} segments")
+
+    recognizer = sr.Recognizer()
 
     for i in range(len(boundaries) - 1):
         start = boundaries[i]
         end = boundaries[i + 1]
-        segment = y[int(start * sr) : int(end * sr)]
-        out_path = os.path.join(outdir, f"segment_{i+1:03d}.wav")
-        sf.write(out_path, segment, sr)
+        segment = y[int(start * sr_rate) : int(end * sr_rate)]
+
+        audio_bytes = (segment * 32767).astype(np.int16).tobytes()
+        sr_data = sr.AudioData(audio_bytes, sr_rate, 2)
+        try:
+            phrase = recognizer.recognize_sphinx(sr_data)
+            logger.debug(f"Segment {i+1} recognized as: {phrase}")
+        except Exception as e:
+            logger.warning(f"Recognition failed for segment {i+1}: {e}")
+            phrase = f"segment_{i+1:03d}"
+
+        base = re.sub(r"[^a-zA-Z0-9_-]+", "_", phrase.strip()).strip("_")
+        if not base:
+            base = f"segment_{i+1:03d}"
+
+        out_path = os.path.join(export_dir, f"{base}.wav")
+        count = 1
+        while os.path.exists(out_path):
+            out_path = os.path.join(export_dir, f"{base}_{count}.wav")
+            count += 1
+
+        sf.write(out_path, segment, sr_rate)
         logger.info(f"Wrote segment {i+1} [{start:.2f}s - {end:.2f}s]: {out_path}")
 
     logger.debug("Segmentation complete")
-    return outdir
+    return export_dir
 
 # --- Custom logging handler to write into QTextEdit ---
 class QTextEditLogger(Handler):

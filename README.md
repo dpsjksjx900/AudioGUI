@@ -1,6 +1,7 @@
 # AudioGUI
 
-This project provides a simple PyQt5 GUI for running syllable segmentation. The GUI can operate in two modes: a dummy forced-alignment mode and an unsupervised mode that uses `librosa` to detect syllable onsets and split the audio into multiple `.wav` files. Results are written to the selected output directory.
+This project provides a simple PyQt5 GUI for running syllable segmentation. The GUI can operate in two modes: a dummy forced-alignment mode and an unsupervised mode that uses `librosa` to detect syllable onsets and split the audio into multiple `.wav` files. Segments are stored in an `export` subfolder under the chosen output directory and named according to the detected pronunciation.
+
 
 ## Setup
 
@@ -22,7 +23,7 @@ On non-Windows systems, use:
 python syllable_segmenter_gui.py
 ```
 
-Drag and drop your audio file (and optionally transcript and lexicon files) then click **Start Segmentation**. Results are written in the specified output directory.
+Drag and drop your audio file (and optionally transcript and lexicon files) then click **Start Segmentation**. Results are stored in an `export` subfolder inside the chosen output directory.
 
 ## Updating
 
