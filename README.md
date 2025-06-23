@@ -22,3 +22,12 @@ python syllable_segmenter_gui.py
 ```
 
 Drag and drop your audio file (and optionally transcript and lexicon files) then click **Start Segmentation**. Results are written in the specified output directory.
+
+## Updating
+
+To get the latest version of AudioGUI, run:
+
+```bash
+update.bat
+```
+
