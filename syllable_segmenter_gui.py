@@ -21,12 +21,32 @@ def run_forced_align(audio: str, transcript: str, lexicon: str, outdir: str, log
 
 
 def run_unsupervised(audio: str, outdir: str, logger: logging.Logger) -> str:
-    """Dummy unsupervised segmentation implementation."""
-    logger.debug("Simulating unsupervised segmentation")
-    result = os.path.join(outdir, "unsupervised.txt")
-    with open(result, "w", encoding="utf-8") as fh:
-        fh.write(f"Unsupervised segmentation for {audio}\n")
-    return result
+    """Split audio into segments based on onset detection."""
+    import librosa
+    import numpy as np
+    import soundfile as sf
+
+    logger.debug("Loading audio file")
+    y, sr = librosa.load(audio, sr=None)
+    duration = librosa.get_duration(y=y, sr=sr)
+
+    logger.debug("Detecting onsets")
+    onsets = librosa.onset.onset_detect(y=y, sr=sr, units="time")
+
+    # Ensure boundaries include start and end
+    boundaries = np.concatenate([[0.0], onsets, [duration]])
+    logger.debug(f"Detected {len(onsets)} onsets; creating {len(boundaries)-1} segments")
+
+    for i in range(len(boundaries) - 1):
+        start = boundaries[i]
+        end = boundaries[i + 1]
+        segment = y[int(start * sr) : int(end * sr)]
+        out_path = os.path.join(outdir, f"segment_{i+1:03d}.wav")
+        sf.write(out_path, segment, sr)
+        logger.info(f"Wrote segment {i+1} [{start:.2f}s - {end:.2f}s]: {out_path}")
+
+    logger.debug("Segmentation complete")
+    return outdir
 
 # --- Custom logging handler to write into QTextEdit ---
 class QTextEditLogger(Handler):
