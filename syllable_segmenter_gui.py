@@ -2,7 +2,6 @@
 import sys
 import os
 import logging
-import subprocess
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QRadioButton, QButtonGroup,
@@ -10,6 +9,24 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 from logging import Handler, Formatter
+
+# --- Segmentation stubs ---
+def run_forced_align(audio: str, transcript: str, lexicon: str, outdir: str, logger: logging.Logger) -> str:
+    """Dummy forced-alignment implementation."""
+    logger.debug("Simulating forced alignment")
+    result = os.path.join(outdir, "forced_align.txt")
+    with open(result, "w", encoding="utf-8") as fh:
+        fh.write(f"Forced alignment result for {audio}\n")
+    return result
+
+
+def run_unsupervised(audio: str, outdir: str, logger: logging.Logger) -> str:
+    """Dummy unsupervised segmentation implementation."""
+    logger.debug("Simulating unsupervised segmentation")
+    result = os.path.join(outdir, "unsupervised.txt")
+    with open(result, "w", encoding="utf-8") as fh:
+        fh.write(f"Unsupervised segmentation for {audio}\n")
+    return result
 
 # --- Custom logging handler to write into QTextEdit ---
 class QTextEditLogger(Handler):
@@ -167,15 +184,16 @@ class MainWindow(QMainWindow):
             if not os.path.isfile(transcript) or not os.path.isfile(lexicon):
                 self.logger.error("Transcript or lexicon missing/invalid.")
                 return
-            self.logger.info(f"Running forced-align on '{audio}' with '{transcript}' & '{lexicon}'")
-            # call run_forced_align(...)
+            self.logger.info(
+                f"Running forced-align on '{audio}' with '{transcript}' & '{lexicon}'"
+            )
+            result = run_forced_align(audio, transcript, lexicon, outdir, self.logger)
         else:
             self.logger.info(f"Running unsupervised segmentation on '{audio}'")
-            # call run_unsup(...)
+            result = run_unsupervised(audio, outdir, self.logger)
 
         try:
-            # Placeholder for real work:
-            # run_segmentation(audio, transcript, lexicon, outdir)
+            self.logger.info(f"Segmentation output written to: {result}")
             self.logger.info("Segmentation completed successfully.")
         except Exception as e:
             self.logger.exception(f"Segmentation failed: {e}")
