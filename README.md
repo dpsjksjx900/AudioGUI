@@ -5,7 +5,8 @@ This project provides a simple PyQt5 GUI for running syllable segmentation. The 
 ## Setup
 
 1. Install Python 3.8+.
-2. Run `python install.py` to create a virtual environment and install dependencies.
+2. On Windows simply run `run_gui.bat`. The first run creates a virtual environment and installs the required packages automatically.
+   On other platforms, run `python install.py` once before launching the GUI.
 
 ## Usage
 
